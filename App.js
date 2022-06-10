@@ -1,19 +1,27 @@
-import React, { useContext, useEffect } from 'react';
-import AuthContext, { AuthContextProvider } from './store/auth-context';
+import React, { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginForm from './components/Login/LoginForm';
+import Home from './components/Home';
 
 const App = () => {
-  const authCtx = useContext(AuthContext);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    console.log(authCtx.isLoggedIn)
-  }, [authCtx.isLoggedIn])
+  const logoutHandler = () => {
+    AsyncStorage.removeItem('isLoggedIn');
+    setIsLoggedIn(false);
+  }
+
+  const loginHandler = () => {
+    AsyncStorage.setItem('isLoggedIn', '1')
+    console.log("logged in")
+    setIsLoggedIn(true);
+  }
 
   return (
-    <AuthContextProvider>
-      {!authCtx.isLoggedIn && <LoginForm />}
-      {authCtx.isLoggedIn && <Home />}
-    </AuthContextProvider>
+    <>
+      {!isLoggedIn && <LoginForm onLogin={loginHandler} />}
+      {isLoggedIn && <Home />}
+    </>
   );
 };
 

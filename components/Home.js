@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
-import Footer from './components/UI/Footer';
-import MainView from './components/UI/MainView';
+import Footer from './UI/Footer';
+import MainView from './UI/MainView';
 
 const Home = () => {
     return (

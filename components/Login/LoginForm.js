@@ -1,17 +1,14 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { TextInput, StyleSheet, Button } from 'react-native';
 import Card from '../UI/Card';
-import AuthContext from '../../store/auth-context';
 
-const LoginForm = () => {
+const LoginForm = (props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const ctx = useContext(AuthContext);
-
     const submitHandler = (event) => {
         event.preventDefault();
-        ctx.onLogin(email, password);
+        props.onLogin(email, password);
     };
 
     return (
