@@ -4,6 +4,7 @@
  *
  * @format
  */
+// const exclusionList = require('metro-config/src/defaults/exclusionList');
 
 module.exports = {
   transformer: {
@@ -14,4 +15,10 @@ module.exports = {
       },
     }),
   },
+  resolver: {
+    sourceExts: ['jsx', 'js', 'ts', 'tsx', 'cjs'],
+    // exclusionList: exclusionList([
+    //     /node_modules\/.*\/node_modules\/react-native\/.*/,
+    // ])
+},
 };

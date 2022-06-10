@@ -1,13 +1,12 @@
 import React from 'react';
 import { StyleSheet, ScrollView, View, Text } from 'react-native';
-import Card from './Card';
 import Accounts from '../Accounts/Accounts';
 import Investments from '../Investments/Investments';
 import Insurance from '../Insurance/Insurance';
 import CreditCards from '../CreditCards/CreditCards';
 import CloudBankMasthead from './CloudBankMasthead';
 
-const MainView = (props) => {
+const MainView = () => {
     return (
         <ScrollView style={styles.main}>
             <CloudBankMasthead />
