@@ -5,7 +5,7 @@ const FooterActionButton = props => {
     return (
         <View style={styles.actionButton} >
             <Pressable onPress={props.onPress}>
-                <Text>{props.name}</Text>
+                <Text style={styles.label}>{props.name}</Text>
             </Pressable>
         </View>
     )
@@ -17,10 +17,15 @@ const styles = StyleSheet.create({
         margin: 5,
         width: 68,
         height: 68,
-        backgroundColor: 'yellow',
+        backgroundColor: 'white',
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 5
+        borderRadius: 5,
+        borderColor: '#91b1e3',
+        borderWidth: 2,
+      },
+      label: {
+        fontSize: 12
       }
   });
 
