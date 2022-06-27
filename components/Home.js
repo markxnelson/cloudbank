@@ -3,10 +3,10 @@ import { View } from 'react-native';
 import Footer from './UI/Footer';
 import MainView from './UI/MainView';
 
-const Home = () => {
+const Home = (props) => {
     return (
         <View style={{ flex: 1, flexDirection: 'column' }}>
-            <MainView />
+            <MainView navigation={props.navigation} />
             <Footer />
         </View>
     );

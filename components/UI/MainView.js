@@ -6,14 +6,13 @@ import Insurance from '../Insurance/Insurance';
 import CreditCards from '../CreditCards/CreditCards';
 import CloudBankMasthead from './CloudBankMasthead';
 
-const MainView = () => {
+const MainView = (props) => {
     return (
         <ScrollView style={styles.main}>
-            <CloudBankMasthead />
             <View>
                 <Text style={{margin: 5}}>Welcome back, Dave!</Text>
             </View>
-            <Accounts />
+            <Accounts navigation={props.navigation} />
             <Investments />
             <Insurance />
             <CreditCards />

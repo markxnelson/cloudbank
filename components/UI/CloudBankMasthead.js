@@ -7,7 +7,7 @@ const CloudBankMasthead = () => {
         <Card style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image 
                 source={require('./cloudbank.png')}
-                style={{ height: 100}} />
+                style={{ height: 84}} />
         </Card>
     )
 }

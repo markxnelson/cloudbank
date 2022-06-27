@@ -4,7 +4,7 @@ import Card from '../UI/Card';
 
 const Accounts = (props) => {
     return (
-        <Card title="My Accounts">
+        <Card title="My Accounts" onPress={() => props.navigation.navigate('AccountDetail')} >
             <View style={styles.row}>
                 <View style={styles.cell}><Text>Checking</Text></View>
                 <View style={styles.cell}><Text style={styles.numbers}>$1,234.56</Text></View>

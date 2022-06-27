@@ -1,16 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 
 const Card = (props) => {
     return (
-        <View
-            onClick={props.onClick}
-            title={props.title}
-            style={styles.card}
-        >
-            {props.title && <Text style={styles.heading}>{props.title}</Text>}
-            {props.children}
-        </View>
+        <TouchableWithoutFeedback onPress={props.onPress}>
+            <View
+                onClick={props.onClick}
+                title={props.title}
+                style={styles.card}
+            >
+                {props.title && <Text style={styles.heading}>{props.title}</Text>}
+                {props.children}
+            </View>
+        </TouchableWithoutFeedback>
     )
 }
 
