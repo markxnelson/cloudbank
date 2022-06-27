@@ -6,6 +6,7 @@ import AccountDetail from './components/Accounts/AccountDetail';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CloudBankMasthead from './components/UI/CloudBankMasthead';
+import Transfer from './components/Transfer/Transfer';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,9 @@ const App = () => {
             <Stack.Screen name="AccountDetail">
               {props => <AccountDetail {...props} accountNumber='100' />}
             </Stack.Screen>
+            <Stack.Screen name="Transfer">
+              {props => <Transfer {...props} />}
+            </Stack.Screen>
           </>
         ) : (
           <>
@@ -46,8 +50,6 @@ const App = () => {
           </>
         )}
       </Stack.Navigator>
-      {/* {!isLoggedIn && <LoginForm onLogin={loginHandler} />}
-      {isLoggedIn && <Home />} */}
     </NavigationContainer>
   );
 };

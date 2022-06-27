@@ -4,7 +4,6 @@ import Accounts from '../Accounts/Accounts';
 import Investments from '../Investments/Investments';
 import Insurance from '../Insurance/Insurance';
 import CreditCards from '../CreditCards/CreditCards';
-import CloudBankMasthead from './CloudBankMasthead';
 
 const MainView = (props) => {
     return (

@@ -7,10 +7,6 @@ const Footer = (props) => {
         console.log("pressed deposit")
     }
 
-    const onPressTransferHandler = props => {
-        console.log("pressed trsansfer")
-    }
-
     const onPressPaymentHandler = props => {
         console.log("pressed payment")
     }
@@ -31,7 +27,7 @@ const Footer = (props) => {
             />
             <FooterActionButton
                 name="Transfer"
-                onPress={onPressTransferHandler}
+                onPress={() => props.navigation.navigate('Transfer')}
             />
             <FooterActionButton
                 name="Payment"

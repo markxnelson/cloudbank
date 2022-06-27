@@ -7,7 +7,7 @@ const Home = (props) => {
     return (
         <View style={{ flex: 1, flexDirection: 'column' }}>
             <MainView navigation={props.navigation} />
-            <Footer />
+            <Footer navigation={props.navigation} />
         </View>
     );
 };
