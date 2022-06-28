@@ -23,7 +23,7 @@ const Footer = (props) => {
         <View style={styles.footer}>
             <FooterActionButton
                 name="Deposit"
-                onPress={onPressDepositHandler}
+                onPress={() => props.navigation.navigate('Deposit')}
             />
             <FooterActionButton
                 name="Transfer"
