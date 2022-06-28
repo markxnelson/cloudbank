@@ -17,6 +17,8 @@ const getAccounts = async (parseAddress, user) => {
 }
 
 const getAccountType = async (parseAddress, accountNum) => {
+    console.log("mark in getAccountType, parseAdress = " + parseAddress + " and accountNum = " + accountNum);
+    if (parseAddress.length < 1) { return }
     const Parse = require('parse/react-native.js');
     Parse.setAsyncStorage(AsyncStorage);
     Parse.initialize("APPLICATION_ID");
@@ -24,6 +26,7 @@ const getAccountType = async (parseAddress, accountNum) => {
     Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
     const params = { "accountNum": accountNum };
     const accountType = await Parse.Cloud.run("getaccounttypeforaccountnum", params);
+    console.log("accountType is " + accountType);
     return accountType;
 }
 
@@ -35,18 +38,21 @@ const Accounts = (props) => {
         console.log("getting accounts for user " + props.user)
         AsyncStorage.getItem('serverAddress')
         .then(address => {
+            setParseAddress(address) // this is a nasty hack
             getAccounts(address, props.user)
             .then(result => {
                 setAccounts(result);
-                console.log("result = " + JSON.stringify(result));
+                //console.log("useEffect result = " + JSON.stringify(result));
             });
             // getAccountType(address, route.params.accountNumber)
             // .then(result => setAccountType(result));
         })
-    }, [props.user, parseAddress, setParseAddress])
+        .catch(error => console.log(error))
+    }, [props.user])
 
     const accountList = accounts.length !== 0 ? accounts
         .map(account => {
+            console.log("calling getAccountType");
             const accountType = getAccountType(parseAddress, account);
             console.log("mark - accountType = " + accountType.result);
 
