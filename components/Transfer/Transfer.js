@@ -1,18 +1,44 @@
 import { Picker } from '@react-native-picker/picker';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, Button, Alert } from 'react-native';
 import Card from '../UI/Card';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const performTransfer = async (parseAddress, fromAccountNum, toAccountNum, amount) => {
+    const Parse = require('parse/react-native.js');
+    Parse.setAsyncStorage(AsyncStorage);
+    Parse.initialize("APPLICATION_ID");
+    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
+
+    const Transfer = Parse.Object.extend("BankAccount");
+    const transfer = new Transfer();
+    transfer.set("accountNum", +fromAccountNum);
+    transfer.set("action", "Transfer");
+    transfer.set("amount", +amount);
+    transfer.set("userId", "mark");
+    transfer.set("toAccountNum", +toAccountNum);
+    transfer.set("accountType", "Checking");
+    transfer.save()
+    .then((id) => console.log("saved with id " + JSON.stringify(id)),
+        (error) => console.log("failed to save, error = " + error))
+}
 
 const Transfer = (props) => {
-    const [fromAccount, setFromAccount] = useState('100')
-    const [toAccount, setToAccount] = useState('102')
+    const [fromAccount, setFromAccount] = useState('45000')
+    const [toAccount, setToAccount] = useState('45102')
     const [amount, setAmount] = useState('0.00')
+    const [parseAddress, setParseAddress] = useState("");
+    
+    useEffect(() => {
+        AsyncStorage.getItem('serverAddress')
+        .then(storedAddress => {
+            console.log(storedAddress);
+            storedAddress && setParseAddress(storedAddress);
+        })
+    }, [parseAddress, setParseAddress])
 
     const transferHandler = () => {
-        console.log("Pressed the transfer button, with data:")
-        console.log("from account: " + fromAccount)
-        console.log("to account: " + toAccount)
-        console.log("Amount: " + amount)
+        performTransfer(parseAddress, fromAccount, toAccount, amount);
         Alert.alert(
             "Transfer",
             "Successfully transfered $" + amount + " from account " + fromAccount + " to account " + toAccount,
@@ -48,8 +74,8 @@ const Transfer = (props) => {
                         <Picker
                             selectedValue={fromAccount}
                             onValueChange={currentFromAccount => setFromAccount(currentFromAccount)}>
-                            <Picker.Item value="100" label="100 : Checking" />
-                            <Picker.Item value="102" label="102 : Savings" />
+                            <Picker.Item value="45000" label="45000 : Checking" />
+                            <Picker.Item value="45102" label="45102 : Savings" />
                         </Picker>
                     </View>
                 </View>
@@ -60,8 +86,8 @@ const Transfer = (props) => {
                         <Picker
                             selectedValue={toAccount}
                             onValueChange={currentToAccount => setToAccount(currentToAccount)}>
-                            <Picker.Item value="100" label="100 : Checking" />
-                            <Picker.Item value="102" label="102 : Savings" />
+                            <Picker.Item value="45000" label="45000 : Checking" />
+                            <Picker.Item value="45102" label="45102 : Savings" />
                         </Picker>
                     </View>
                 </View>

@@ -21,7 +21,6 @@ const performDeposit = async (parseAddress, accountNum, amount) => {
     deposit.save()
     .then((id) => console.log("saved with id " + JSON.stringify(id)),
         (error) => console.log("failed to save, error = " + error))
-
 }
 
 const Deposit = (props) => {
