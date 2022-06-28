@@ -11,7 +11,7 @@ const MainView = (props) => {
             <View>
                 <Text style={{margin: 5}}>Welcome back, {props.user}!</Text>
             </View>
-            <Accounts navigation={props.navigation} />
+            <Accounts navigation={props.navigation} user={props.user} />
             <Investments />
             <Insurance />
             <CreditCards />
