@@ -5,7 +5,7 @@ import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const performDeposit = async (parseAddress, accountNum, amount) => {
+const performDeposit = async (parseAddress, accountNum, amount, accountType) => {
     const Parse = require('parse/react-native.js');
     Parse.setAsyncStorage(AsyncStorage);
     Parse.initialize("APPLICATION_ID");
@@ -17,16 +17,30 @@ const performDeposit = async (parseAddress, accountNum, amount) => {
     deposit.set("action", "Deposit");
     deposit.set("amount", +amount);
     deposit.set("userId", "mark");
-    deposit.set("accountType", "Checking");
+    deposit.set("accountType", accountType);
     deposit.save()
     .then((id) => console.log("saved with id " + JSON.stringify(id)),
         (error) => console.log("failed to save, error = " + error))
 }
 
+const getAccountType = async (parseAddress, accountNum) => {
+    const Parse = require('parse/react-native.js');
+    Parse.setAsyncStorage(AsyncStorage);
+    Parse.initialize("APPLICATION_ID");
+    //console.log("in getAccountType() and parse address is " + parseAddress)
+    //console.log("and accountNum is " + accountNum)
+    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
+
+    const params = { "accountNum": +accountNum };
+    const accountType = await Parse.Cloud.run("getaccounttypeforaccountnum", params);
+    //console.log("mark: " + accountType)
+    return accountType;
+}
+
 const Deposit = (props) => {
     const [toAccount, setToAccount] = useState('45000')
     const [amount, setAmount] = useState('0.00')
-    const [parseAddress, setParseAddress] = useState("");
+    const [parseAddress, setParseAddress] = useState('');
     
     useEffect(() => {
         AsyncStorage.getItem('serverAddress')
@@ -36,8 +50,10 @@ const Deposit = (props) => {
         })
     }, [parseAddress, setParseAddress])
 
-    const depositHandler = () => {
-        performDeposit(parseAddress, toAccount, amount);
+    const depositHandler = async () => {
+        const accountType = await getAccountType(parseAddress, toAccount);
+        //console.log("mark - accountType = " + accountType);
+        performDeposit(parseAddress, toAccount, amount, accountType);
         Alert.alert(
             "Deposit",
             "Successfully deposited $" + amount +" in to account " + toAccount,
@@ -46,7 +62,6 @@ const Deposit = (props) => {
                     text: 'OK',
                     style: 'cancel',
                     onPress: () => {
-                        console.log('ok pressed')
                         props.navigation.navigate('Home')
                     }
                 }

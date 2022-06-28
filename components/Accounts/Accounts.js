@@ -8,7 +8,7 @@ const getAccounts = async (parseAddress, user) => {
     const Parse = require('parse/react-native.js');
     Parse.setAsyncStorage(AsyncStorage);
     Parse.initialize("APPLICATION_ID");
-    console.log("in getAccounts() and parse address is " + parseAddress)
+    //console.log("in getAccounts() and parse address is " + parseAddress)
     Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
 
     const params = { "userId": user };
@@ -20,7 +20,7 @@ const getAccountType = async (parseAddress, accountNum) => {
     const Parse = require('parse/react-native.js');
     Parse.setAsyncStorage(AsyncStorage);
     Parse.initialize("APPLICATION_ID");
-    console.log("in getAccountType() for " + accountNum)
+    // console.log("in getAccountType() for " + accountNum)
     Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
     const params = { "accountNum": accountNum };
     const accountType = await Parse.Cloud.run("getaccounttypeforaccountnum", params);
@@ -47,22 +47,14 @@ const Accounts = (props) => {
 
     const accountList = accounts.length !== 0 ? accounts
         .map(account => {
-            let accountType;
-            AsyncStorage.getItem('serverAddress')
-            .then(address => {
-                getAccountType(address, account)
-                .then(result => {
-                    console.log("account type result = " + result);
-                    accountType = result;
-                });
-            })
-            console.log("mark - accountType = " + accountType);
+            const accountType = getAccountType(parseAddress, account);
+            console.log("mark - accountType = " + accountType.result);
 
             return (
                 <TouchableWithoutFeedback onPress={() => props.navigation.navigate('AccountDetail', { accountNumber: account })}>
                     <View style={styles.row} key={account}>
                         <View style={styles.cell}><Text>{account}</Text></View>
-                        <View style={styles.cell}><Text>{accountType}</Text></View>
+                        <View style={styles.cell}><Text>accountType</Text></View>
                         <View style={styles.cell}><Text style={styles.numbers}>$1,234.56</Text></View>
                     </View>
                 </TouchableWithoutFeedback>

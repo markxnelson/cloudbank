@@ -70,6 +70,7 @@ const AccountDetail = ({route, navigation}) => {
             </View>
         )
 
+    // TODO call balnce api instead of calculating it here
     const balance = history.length === 0 ? 0 : history.reduce((prev, current) => {
         return prev + JSON.parse(JSON.stringify(current)).amount 
     }, 0) 

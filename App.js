@@ -31,6 +31,7 @@ const App = () => {
       Alert.alert("You must enter your password");
       return;
     }
+    // TODO call API to validate user exists, etc.
     AsyncStorage.setItem('isLoggedIn', '1')
     AsyncStorage.setItem('serverAddress', serverAddress)
     setUser(user);
