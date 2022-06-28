@@ -9,6 +9,7 @@ import CloudBankMasthead from './components/UI/CloudBankMasthead';
 import Transfer from './components/Transfer/Transfer';
 import Deposit from './components/Deposit/Deposit';
 import Payment from './components/Payment/Payment';
+import { Alert } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +23,14 @@ const App = () => {
   }
 
   const loginHandler = (user, password, serverAddress) => {
+    if (user.length < 1) {
+      Alert.alert("You must enter your username");
+      return;
+    }
+    if (password.length < 1) {
+      Alert.alert("You must enter your password");
+      return;
+    }
     AsyncStorage.setItem('isLoggedIn', '1')
     AsyncStorage.setItem('serverAddress', serverAddress)
     setUser(user);
