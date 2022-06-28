@@ -31,7 +31,7 @@ const Footer = (props) => {
             />
             <FooterActionButton
                 name="Payment"
-                onPress={onPressPaymentHandler}
+                onPress={() => props.navigation.navigate('Payment')}
             />
             <FooterActionButton
                 name="Bill Pay"

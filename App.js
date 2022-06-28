@@ -8,6 +8,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CloudBankMasthead from './components/UI/CloudBankMasthead';
 import Transfer from './components/Transfer/Transfer';
 import Deposit from './components/Deposit/Deposit';
+import Payment from './components/Payment/Payment';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +42,9 @@ const App = () => {
             </Stack.Screen>
             <Stack.Screen name="Transfer">
               {props => <Transfer {...props} />}
+            </Stack.Screen>
+            <Stack.Screen name="Payment">
+              {props => <Payment {...props} />}
             </Stack.Screen>
             <Stack.Screen name="Deposit">
               {props => <Deposit {...props} />}
