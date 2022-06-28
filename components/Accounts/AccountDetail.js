@@ -17,9 +17,22 @@ const getHistory = async (parseAddress, accountNum) => {
     return history;
 }
 
+const getAccountType = async (parseAddress, accountNum) => {
+        const Parse = require('parse/react-native.js');
+    Parse.setAsyncStorage(AsyncStorage);
+    Parse.initialize("APPLICATION_ID");
+    console.log("in getHistory() and parse address is " + parseAddress)
+    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
+
+    const params = { "accountNum": accountNum };
+    const accountType = await Parse.Cloud.run("getaccounttypeforaccountnum", params);
+    return accountType;
+}
+
 const AccountDetail = (props) => {
     const [history, setHistory] = useState([]);
     const [parseAddress, setParseAddress] = useState("");
+    const [accountType, setAccountType] = useState("");
 
     useEffect(() => {
         AsyncStorage.getItem('serverAddress')
@@ -27,6 +40,8 @@ const AccountDetail = (props) => {
             getHistory(address, 45000)
             .then(result => setHistory(result));
             console.log("result = " + JSON.stringify(history));
+            getAccountType(address, 45000)
+            .then(result => setAccountType(result));
         })
     }, [props.accountNum, parseAddress, setParseAddress])
 
@@ -54,9 +69,28 @@ const AccountDetail = (props) => {
             </View>
         )
 
+    const balance = history.length === 0 ? 0 : history.reduce((prev, current) => {
+        return prev + JSON.parse(JSON.stringify(current)).amount 
+    }, 0) 
+    const formattedBalance = formatCurrency({amount : (balance).toFixed(2), code: 'USD' })[0];
+
     return (
         <ScrollView style={styles.main}>
-            <Card title={"My Checking Account : " + props.accountNumber}>
+            <Card title="Account Details">
+                <View style={styles.row}>
+                    <View style={styles.cell}><Text>Account Number</Text></View>
+                    <View style={styles.cell}><Text style={styles.numbers}>{props.accountNumber}</Text></View>
+                </View>
+                <View style={styles.row}>
+                    <View style={styles.cell}><Text>Account Type</Text></View>
+                    <View style={styles.cell}><Text style={styles.numbers}>{accountType}</Text></View>
+                </View>
+                <View style={styles.row}>
+                    <View style={styles.cell}><Text>Current balance</Text></View>
+                    <View style={styles.cell}><Text style={styles.numbers}>{formattedBalance}</Text></View>
+                </View>
+            </Card>
+            <Card title="Recent Transactions">
                 {transactions}
             </Card>
         </ScrollView>

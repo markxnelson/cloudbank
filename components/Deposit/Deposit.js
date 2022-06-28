@@ -17,6 +17,7 @@ const performDeposit = async (parseAddress, accountNum, amount) => {
     deposit.set("action", "Deposit");
     deposit.set("amount", +amount);
     deposit.set("userId", "mark");
+    deposit.set("accountType", "Checking");
     deposit.save()
     .then((id) => console.log("saved with id " + JSON.stringify(id)),
         (error) => console.log("failed to save, error = " + error))
