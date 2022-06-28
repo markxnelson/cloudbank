@@ -8,7 +8,9 @@ const getHistory = async (parseAddress, accountNum) => {
     const Parse = require('parse/react-native.js');
     Parse.setAsyncStorage(AsyncStorage);
     Parse.initialize("APPLICATION_ID");
+    console.log("in getHistory() and parse address is " + parseAddress)
     Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
+
     const params = { "accountNum": accountNum };
     const history = await Parse.Cloud.run("history", params);
     //console.log("cloud code result= " + JSON.stringify(history));
@@ -18,23 +20,21 @@ const getHistory = async (parseAddress, accountNum) => {
 const AccountDetail = (props) => {
     const [history, setHistory] = useState([]);
     const [parseAddress, setParseAddress] = useState("");
-    
+
     useEffect(() => {
         AsyncStorage.getItem('serverAddress')
-        .then(storedAddress => {
-            console.log(storedAddress);
-            storedAddress && setParseAddress(storedAddress);
+        .then(address => {
+            getHistory(address, 45000)
+            .then(result => setHistory(result));
+            console.log("result = " + JSON.stringify(history));
         })
-    }, [parseAddress, setParseAddress])
+    }, [props.accountNum, parseAddress, setParseAddress])
 
-    useEffect(() => {
-        getHistory(parseAddress, 45000)
-        .then(result => setHistory(result));
-        console.log("result = " + JSON.stringify(history));
-    }, [props.accountNum])
-
+    // i need to sort the transactions by date before rendering them...
     const transactions = 
-        history.length !== 0 ? history.map(transaction => {
+        history.length !== 0 ? history
+            .sort((a, b) => new Date(JSON.parse(JSON.stringify(b)).createdAt) - new Date(JSON.parse(JSON.stringify(a)).createdAt))
+            .map(transaction => {
             const t = JSON.parse(JSON.stringify(transaction));
             var date = new Date(t.createdAt).toDateString();
             var amount = formatCurrency({amount : (+t.amount).toFixed(2), code: 'USD' })[0];
