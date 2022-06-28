@@ -9,7 +9,7 @@ const MainView = (props) => {
     return (
         <ScrollView style={styles.main}>
             <View>
-                <Text style={{margin: 5}}>Welcome back, Dave!</Text>
+                <Text style={{margin: 5}}>Welcome back, {props.user}!</Text>
             </View>
             <Accounts navigation={props.navigation} />
             <Investments />

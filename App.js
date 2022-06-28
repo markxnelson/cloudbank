@@ -14,6 +14,7 @@ const Stack = createNativeStackNavigator();
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState("");
 
   const logoutHandler = () => {
     AsyncStorage.removeItem('isLoggedIn');
@@ -23,6 +24,7 @@ const App = () => {
   const loginHandler = (user, password, serverAddress) => {
     AsyncStorage.setItem('isLoggedIn', '1')
     AsyncStorage.setItem('serverAddress', serverAddress)
+    setUser(user);
     console.log("logged in " + user + " " + password + " " + serverAddress)
     setIsLoggedIn(true);
   }
@@ -36,7 +38,7 @@ const App = () => {
         {isLoggedIn ? (
           <>
             <Stack.Screen name="Home">
-                {props => <Home {...props} onLogout={logoutHandler} />}
+                {props => <Home {...props} onLogout={logoutHandler} user={user} />}
             </Stack.Screen>
             <Stack.Screen name="AccountDetail">
               {props => <AccountDetail {...props} />}

@@ -6,7 +6,7 @@ import MainView from './UI/MainView';
 const Home = (props) => {
     return (
         <View style={{ flex: 1, flexDirection: 'column' }}>
-            <MainView navigation={props.navigation} />
+            <MainView navigation={props.navigation} user={props.user} />
             <Footer navigation={props.navigation} onLogout={props.onLogout} />
         </View>
     );
