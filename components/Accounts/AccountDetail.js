@@ -29,21 +29,22 @@ const getAccountType = async (parseAddress, accountNum) => {
     return accountType;
 }
 
-const AccountDetail = (props) => {
+const AccountDetail = ({route, navigation}) => {
     const [history, setHistory] = useState([]);
     const [parseAddress, setParseAddress] = useState("");
     const [accountType, setAccountType] = useState("");
 
     useEffect(() => {
+        console.log("mark account number =" + route.params.accountNumber)
         AsyncStorage.getItem('serverAddress')
         .then(address => {
-            getHistory(address, 45000)
+            getHistory(address, route.params.accountNumber)
             .then(result => setHistory(result));
             console.log("result = " + JSON.stringify(history));
-            getAccountType(address, 45000)
+            getAccountType(address, route.params.accountNumber)
             .then(result => setAccountType(result));
         })
-    }, [props.accountNum, parseAddress, setParseAddress])
+    }, [route.params.accountNum, parseAddress, setParseAddress])
 
     // i need to sort the transactions by date before rendering them...
     const transactions = 
@@ -79,7 +80,7 @@ const AccountDetail = (props) => {
             <Card title="Account Details">
                 <View style={styles.row}>
                     <View style={styles.cell}><Text>Account Number</Text></View>
-                    <View style={styles.cell}><Text style={styles.numbers}>{props.accountNumber}</Text></View>
+                    <View style={styles.cell}><Text style={styles.numbers}>{route.params.accountNumber}</Text></View>
                 </View>
                 <View style={styles.row}>
                     <View style={styles.cell}><Text>Account Type</Text></View>

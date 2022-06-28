@@ -39,7 +39,7 @@ const App = () => {
                 {props => <Home {...props} onLogout={logoutHandler} />}
             </Stack.Screen>
             <Stack.Screen name="AccountDetail">
-              {props => <AccountDetail {...props} accountNumber='100' />}
+              {props => <AccountDetail {...props} />}
             </Stack.Screen>
             <Stack.Screen name="Transfer">
               {props => <Transfer {...props} />}
