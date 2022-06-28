@@ -2,12 +2,32 @@ import { Picker } from '@react-native-picker/picker';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, Button, Alert } from 'react-native';
 import Card from '../UI/Card';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const performDeposit = async (accountNum, amount) => {
+    const Parse = require('parse/react-native.js');
+    Parse.setAsyncStorage(AsyncStorage);
+    Parse.initialize("APPLICATION_ID");
+    Parse.serverURL = 'http://193.122.128.128:1337/parse';
+
+    const Deposit = Parse.Object.extend("BankAccount");
+    const deposit = new Deposit();
+    deposit.set("accountNum", +accountNum);
+    deposit.set("action", "Deposit");
+    deposit.set("amount", +amount);
+    deposit.set("userId", "mark");
+    deposit.save()
+    .then((id) => console.log("saved with id " + JSON.stringify(id)),
+        (error) => console.log("failed to save, error = " + error))
+
+}
 
 const Deposit = (props) => {
-    const [toAccount, setToAccount] = useState('100')
+    const [toAccount, setToAccount] = useState('45000')
     const [amount, setAmount] = useState('0.00')
 
     const depositHandler = () => {
+        performDeposit(toAccount, amount);
         Alert.alert(
             "Deposit",
             "Successfully deposited $" + amount +" in to account " + toAccount,
@@ -41,8 +61,8 @@ const Deposit = (props) => {
                         <Picker
                             selectedValue={toAccount}
                             onValueChange={currentToAccount => setToAccount(currentToAccount)}>
-                            <Picker.Item value="100" label="100 : Checking" />
-                            <Picker.Item value="102" label="102 : Savings" />
+                            <Picker.Item value="45000" label="45000 : Checking" />
+                            <Picker.Item value="45102" label="45102 : Savings" />
                         </Picker>
                     </View>
                 </View>

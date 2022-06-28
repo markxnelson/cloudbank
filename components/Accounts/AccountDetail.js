@@ -18,7 +18,7 @@ const getHistory = async (accountNum) => {
 const AccountDetail = (props) => {
     const [history, setHistory] = useState([]);
     useEffect(() => {
-        getHistory(10000)
+        getHistory(45000)
         .then(result => setHistory(result));
         console.log("result = " + JSON.stringify(history));
     }, [props.accountNum])
