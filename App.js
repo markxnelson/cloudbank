@@ -34,7 +34,7 @@ const App = () => {
         {isLoggedIn ? (
           <>
             <Stack.Screen name="Home">
-                {props => <Home {...props} />}
+                {props => <Home {...props} onLogout={logoutHandler} />}
             </Stack.Screen>
             <Stack.Screen name="AccountDetail">
               {props => <AccountDetail {...props} accountNumber='100' />}

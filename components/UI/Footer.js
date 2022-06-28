@@ -38,8 +38,8 @@ const Footer = (props) => {
                 onPress={onPressBillPayHandler}
             />
             <FooterActionButton
-                name="More"
-                onPress={onPressMoreHandler}
+                name="Logout"
+                onPress={props.onLogout}  
             />
         </View>
     )
