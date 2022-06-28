@@ -54,7 +54,7 @@ const AccountDetail = (props) => {
             var date = new Date(t.createdAt).toDateString();
             var amount = formatCurrency({amount : (+t.amount).toFixed(2), code: 'USD' })[0];
             return (
-                <View style={styles.row}>
+                <View style={styles.row} key={t.objectId}>
                     <View style={styles.cell}><Text>{date}</Text></View>
                     <View style={styles.cell}><Text>{t.action}</Text></View>
                     <View style={styles.cell}><Text style={styles.numbers}>{amount}</Text></View>
