@@ -4,11 +4,11 @@ import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatCurrency } from "react-native-format-currency";
 
-const getHistory = async (accountNum) => {
+const getHistory = async (parseAddress, accountNum) => {
     const Parse = require('parse/react-native.js');
     Parse.setAsyncStorage(AsyncStorage);
     Parse.initialize("APPLICATION_ID");
-    Parse.serverURL = 'http://193.122.128.128:1337/parse';
+    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
     const params = { "accountNum": accountNum };
     const history = await Parse.Cloud.run("history", params);
     //console.log("cloud code result= " + JSON.stringify(history));
@@ -17,8 +17,18 @@ const getHistory = async (accountNum) => {
 
 const AccountDetail = (props) => {
     const [history, setHistory] = useState([]);
+    const [parseAddress, setParseAddress] = useState("");
+    
     useEffect(() => {
-        getHistory(45000)
+        AsyncStorage.getItem('serverAddress')
+        .then(storedAddress => {
+            console.log(storedAddress);
+            storedAddress && setParseAddress(storedAddress);
+        })
+    }, [parseAddress, setParseAddress])
+
+    useEffect(() => {
+        getHistory(parseAddress, 45000)
         .then(result => setHistory(result));
         console.log("result = " + JSON.stringify(history));
     }, [props.accountNum])

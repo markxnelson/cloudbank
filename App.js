@@ -20,9 +20,10 @@ const App = () => {
     setIsLoggedIn(false);
   }
 
-  const loginHandler = () => {
+  const loginHandler = (user, password, serverAddress) => {
     AsyncStorage.setItem('isLoggedIn', '1')
-    console.log("logged in")
+    AsyncStorage.setItem('serverAddress', serverAddress)
+    console.log("logged in " + user + " " + password + " " + serverAddress)
     setIsLoggedIn(true);
   }
 

@@ -1,14 +1,15 @@
 import { Picker } from '@react-native-picker/picker';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, Button, Alert } from 'react-native';
 import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const performDeposit = async (accountNum, amount) => {
+
+const performDeposit = async (parseAddress, accountNum, amount) => {
     const Parse = require('parse/react-native.js');
     Parse.setAsyncStorage(AsyncStorage);
     Parse.initialize("APPLICATION_ID");
-    Parse.serverURL = 'http://193.122.128.128:1337/parse';
+    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
 
     const Deposit = Parse.Object.extend("BankAccount");
     const deposit = new Deposit();
@@ -25,9 +26,18 @@ const performDeposit = async (accountNum, amount) => {
 const Deposit = (props) => {
     const [toAccount, setToAccount] = useState('45000')
     const [amount, setAmount] = useState('0.00')
+    const [parseAddress, setParseAddress] = useState("");
+    
+    useEffect(() => {
+        AsyncStorage.getItem('serverAddress')
+        .then(storedAddress => {
+            console.log(storedAddress);
+            storedAddress && setParseAddress(storedAddress);
+        })
+    }, [parseAddress, setParseAddress])
 
     const depositHandler = () => {
-        performDeposit(toAccount, amount);
+        performDeposit(parseAddress, toAccount, amount);
         Alert.alert(
             "Deposit",
             "Successfully deposited $" + amount +" in to account " + toAccount,
