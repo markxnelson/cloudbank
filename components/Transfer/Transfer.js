@@ -138,7 +138,7 @@ const Transfer = props => {
         <View>
           <Text> </Text>
           <Text>From account:</Text>
-          <View style={{borderWidth: 1, borderColor: 'gray'}}>
+          <View style={styles.picker}>
             <Picker
               selectedValue={fromAccount}
               onValueChange={currentFromAccount =>
@@ -151,7 +151,7 @@ const Transfer = props => {
         <View>
           <Text> </Text>
           <Text>To account:</Text>
-          <View style={{borderWidth: 1, borderColor: 'gray'}}>
+          <View style={styles.picker}>
             <Picker
               selectedValue={toAccount}
               onValueChange={currentToAccount =>
@@ -164,7 +164,7 @@ const Transfer = props => {
         <View>
           <Text> </Text>
           <Text>Amount:</Text>
-          <View style={{borderWidth: 1, borderColor: 'gray'}}>
+          <View style={styles.picker}>
             <TextInput
               placeholder="0.00"
               keyboardType="number-pad"
@@ -199,6 +199,10 @@ const styles = StyleSheet.create({
   },
   numbers: {
     textAlign: 'right',
+  },
+  picker: {
+    borderWidth: 1,
+    borderColor: 'gray',
   },
 });
 

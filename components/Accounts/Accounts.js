@@ -66,10 +66,12 @@ const Accounts = props => {
       .catch(error => console.log(error));
 
     // force refresh after BACK
+    /* eslint-disable no-unused-vars */
     const willFocusSubscription = props.navigation.addListener('focus', () =>
       setRefresh(refresh + 1),
     );
-  }, [refresh]);
+    /* eslint-enable no-unused-vars */
+  }, [refresh, props.navigation, props.user]);
 
   // sort the account by account number
   const accountList =

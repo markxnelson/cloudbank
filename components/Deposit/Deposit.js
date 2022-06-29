@@ -122,7 +122,7 @@ const Deposit = props => {
         <View>
           <Text> </Text>
           <Text>To account:</Text>
-          <View style={{borderWidth: 1, borderColor: 'gray'}}>
+          <View style={styles.input}>
             <Picker
               selectedValue={toAccount}
               onValueChange={currentToAccount =>
@@ -135,7 +135,7 @@ const Deposit = props => {
         <View>
           <Text> </Text>
           <Text>Amount:</Text>
-          <View style={{borderWidth: 1, borderColor: 'gray'}}>
+          <View style={styles.input}>
             <TextInput
               placeholder="0.00"
               keyboardType="number-pad"
@@ -154,6 +154,10 @@ const Deposit = props => {
 const styles = StyleSheet.create({
   main: {
     flex: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: 'gray',
   },
   row: {
     flex: 1,

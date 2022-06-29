@@ -12,14 +12,14 @@ const MainView = props => {
   return (
     <ScrollView style={styles.main}>
       <View>
-        <Text style={{margin: 5}}>Welcome back, {props.user}!</Text>
+        <Text style={styles.welcome}>Welcome back, {props.user}!</Text>
       </View>
       <Accounts navigation={props.navigation} user={props.user} />
       <Investments />
       <Insurance />
       <CreditCards />
       {/* hack so that footer will not cover the bottom of the main content */}
-      <Text style={{height: 120}}> </Text>
+      <Text style={styles.bottom}> </Text>
     </ScrollView>
   );
 };
@@ -29,6 +29,12 @@ const styles = StyleSheet.create({
     flex: 10,
     backgroundColor: '#e1e2e3',
     width: '100%',
+  },
+  bottom: {
+    height: 120,
+  },
+  welcome: {
+    margin: 5,
   },
 });
 

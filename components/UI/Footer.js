@@ -2,24 +2,12 @@
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 import React from 'react';
-import {StyleSheet, View, Text} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import FooterActionButton from './FooterActionButton';
 
 const Footer = props => {
-  const onPressDepositHandler = props => {
-    console.log('pressed deposit');
-  };
-
-  const onPressPaymentHandler = props => {
-    console.log('pressed payment');
-  };
-
-  const onPressBillPayHandler = props => {
+  const onPressBillPayHandler = () => {
     console.log('pressed bill pay');
-  };
-
-  const onPressMoreHandler = props => {
-    console.log('pressed more');
   };
 
   return (

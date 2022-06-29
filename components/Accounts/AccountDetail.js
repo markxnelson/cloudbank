@@ -24,9 +24,10 @@ const AccountDetail = ({route, navigation}) => {
         .then(result => setAccountType(result))
         .catch(error => console.log(error));
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route.params.accountNum, parseAddress, setParseAddress]);
 
-  // i need to sort the transactions by date before rendering them...
+  // sort the transactions by date before rendering them
   const transactions =
     history.length !== 0 ? (
       history

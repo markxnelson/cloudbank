@@ -29,9 +29,9 @@ const App = () => {
   };
 
   // called when the user logs in
-  const loginHandler = (user, password, serverAddress) => {
+  const loginHandler = (username, password, serverAddress) => {
     // do some very basic form validation
-    if (user.length < 1) {
+    if (username.length < 1) {
       Alert.alert('You must enter your username');
       return;
     }
@@ -44,7 +44,7 @@ const App = () => {
     // store the logged in state and the server address that the user entered
     AsyncStorage.setItem('isLoggedIn', '1');
     AsyncStorage.setItem('serverAddress', serverAddress);
-    setUser(user);
+    setUser(username);
     setIsLoggedIn(true);
   };
 
