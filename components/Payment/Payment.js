@@ -4,6 +4,25 @@ import { View, Text, StyleSheet, ScrollView, TextInput, Button, Alert } from 're
 import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const performTransfer = async (parseAddress, fromAccountNum, toAccountNum, amount, accountType) => {
+    const Parse = require('parse/react-native.js');
+    Parse.setAsyncStorage(AsyncStorage);
+    Parse.initialize("APPLICATION_ID");
+    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
+
+    const Transfer = Parse.Object.extend("BankAccount");
+    const transfer = new Transfer();
+    transfer.set("accountNum", +fromAccountNum);
+    transfer.set("action", "Transfer");
+    transfer.set("amount", +amount);
+    transfer.set("userId", "mark");
+    transfer.set("externalAccountNum", +toAccountNum);
+    transfer.set("accountType", accountType);
+    transfer.save()
+    .then((id) => console.log("saved with id " + JSON.stringify(id)),
+        (error) => console.log("failed to save, error = " + error))
+}
+
 const getAccounts = async (parseAddress, user) => {
     const Parse = require('parse/react-native.js');
     Parse.setAsyncStorage(AsyncStorage);
@@ -77,6 +96,11 @@ const Payment = (props) => {
     }) : <></>
 
     const paymentHandler = () => {
+        // get the account type
+        const accountType = accounts.find(item => item.accountNumber === fromAccount).accountType
+
+        performTransfer(parseAddress, fromAccount, toAccount, amount, accountType);
+        
         Alert.alert(
             "Payment",
             "Successfully paid $" + amount + " from account " + fromAccount + " to external account " + toAccount,
