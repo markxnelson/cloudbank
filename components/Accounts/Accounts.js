@@ -97,7 +97,7 @@ const Accounts = (props) => {
 
     // sort the account by account number
     const accountList = accounts.length !== 0 ? accounts
-        .sort((a, b) => (+b.accountNumber) - (+a.accountNumber))
+        .sort((a, b) => (+a.accountNumber) - (+b.accountNumber))
         .map(account => {
             return (
                 <TouchableWithoutFeedback onPress={() => props.navigation.navigate('AccountDetail', { accountNumber: account.accountNumber })}>
