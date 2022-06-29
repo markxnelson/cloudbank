@@ -16,6 +16,7 @@ import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getAccountType, getAccounts} from '../common/common';
 
+// this function performs the actual deposit on the backend
 const performDeposit = async (
   parseAddress,
   accountNum,
@@ -46,12 +47,15 @@ const Deposit = props => {
   const [parseAddress, setParseAddress] = useState('');
   const [accounts, setAccounts] = useState([]);
 
+  // hook to get and save the parse server address in local state
   useEffect(() => {
     AsyncStorage.getItem('serverAddress').then(storedAddress => {
       storedAddress && setParseAddress(storedAddress);
     });
   }, [parseAddress, setParseAddress]);
 
+  // hook to get the list of account numbers for the user, and then
+  // for each account, get the type, and save this data in local state
   useEffect(() => {
     AsyncStorage.getItem('serverAddress').then(address => {
       getAccounts(address, props.user).then(accountNumbers => {
@@ -74,6 +78,7 @@ const Deposit = props => {
     });
   }, [props.user]);
 
+  // sort the accounts and render a picker
   const accountList =
     accounts.length !== 0 ? (
       accounts
@@ -91,9 +96,15 @@ const Deposit = props => {
       <></>
     );
 
+    // this function handles the press on the deposit button
   const depositHandler = async () => {
+    // lookup the account type
     const accountType = await getAccountType(parseAddress, toAccount);
+    
+    // perform the actual deposit transaction
     performDeposit(parseAddress, toAccount, amount, accountType);
+
+    // report success to the user
     Alert.alert(
       'Deposit',
       'Successfully deposited $' + amount + ' in to account ' + toAccount,
@@ -109,7 +120,6 @@ const Deposit = props => {
       {
         cancelable: true,
         onDismiss: () => {
-          console.log('dismissed');
           props.navigation.navigate('Home');
         },
       },

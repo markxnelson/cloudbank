@@ -5,10 +5,11 @@ import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import Card from '../UI/Card';
 
+// this is really a placeholder for future use
 const Investments = () => {
   return (
     <Card title="My Investments">
-      <View style={styles.row}>
+      <View key="1" style={styles.row}>
         <View style={styles.cell}>
           <Text>Fidelity</Text>
         </View>
@@ -16,7 +17,7 @@ const Investments = () => {
           <Text style={styles.numbers}>$876,987.56</Text>
         </View>
       </View>
-      <View style={styles.row}>
+      <View key="2" style={styles.row}>
         <View style={styles.cell}>
           <Text>E*Trade</Text>
         </View>

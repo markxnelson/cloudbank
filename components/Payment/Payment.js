@@ -16,6 +16,7 @@ import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getAccountType, getAccounts} from '../common/common';
 
+// this function performs the actual transfer on the backend
 const performTransfer = async (
   parseAddress,
   fromAccountNum,
@@ -23,6 +24,7 @@ const performTransfer = async (
   amount,
   accountType,
   destinationBank,
+  user,
 ) => {
   const Parse = require('parse/react-native.js');
   Parse.setAsyncStorage(AsyncStorage);
@@ -34,7 +36,10 @@ const performTransfer = async (
   transfer.set('accountNum', +fromAccountNum);
   transfer.set('action', 'Transfer');
   transfer.set('amount', +amount);
-  transfer.set('userId', 'mark');
+  transfer.set('userId', user);
+  // TODO this assumes the bank is always CloudBank, need to fix this
+  // if we are transfering to another user's account at the same bank,
+  // we provide toAccountNum, otherwise, we provide externalAccountNum
   destinationBank === 'CloudBank'
     ? transfer.set('toAccountNum', +toAccountNum)
     : transfer.set('externalAccountNum', +toAccountNum);
@@ -53,13 +58,15 @@ const Payment = props => {
   const [parseAddress, setParseAddress] = useState('');
   const [accounts, setAccounts] = useState([]);
 
+  // hook to retreive the parse server address and store in local state
   useEffect(() => {
     AsyncStorage.getItem('serverAddress').then(storedAddress => {
-      console.log(storedAddress);
       storedAddress && setParseAddress(storedAddress);
     });
   }, [parseAddress, setParseAddress]);
 
+  // hook to get the user's account numbers and lookup the type for each
+  // one and store this in local state - we use this in the picker
   useEffect(() => {
     AsyncStorage.getItem('serverAddress').then(address => {
       getAccounts(address, props.user).then(accountNumbers => {
@@ -113,6 +120,7 @@ const Payment = props => {
       amount,
       accountType,
       destinationBank,
+      props.user,
     );
 
     // report success to the user
@@ -129,7 +137,6 @@ const Payment = props => {
           text: 'OK',
           style: 'cancel',
           onPress: () => {
-            console.log('ok pressed');
             props.navigation.navigate('Home');
           },
         },
@@ -137,7 +144,6 @@ const Payment = props => {
       {
         cancelable: true,
         onDismiss: () => {
-          console.log('dismissed');
           props.navigation.navigate('Home');
         },
       },

@@ -5,10 +5,11 @@ import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import Card from '../UI/Card';
 
+// this is really a placeholder for future use
 const Insurance = () => {
   return (
     <Card title="My Insurance">
-      <View style={styles.row}>
+      <View key="1" style={styles.row}>
         <View style={styles.cell}>
           <Text>Auto</Text>
         </View>
@@ -16,7 +17,7 @@ const Insurance = () => {
           <Text style={styles.numbers}>$250.00 / mo</Text>
         </View>
       </View>
-      <View style={styles.row}>
+      <View key="2" style={styles.row}>
         <View style={styles.cell}>
           <Text>Home</Text>
         </View>
@@ -24,7 +25,7 @@ const Insurance = () => {
           <Text style={styles.numbers}>$150.00 / mo</Text>
         </View>
       </View>
-      <View style={styles.row}>
+      <View key="3" style={styles.row}>
         <View style={styles.cell}>
           <Text>Health</Text>
         </View>

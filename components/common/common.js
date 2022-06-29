@@ -3,6 +3,11 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+//
+// these are common functions that are used by a number of components
+// they generally retrieve various data from the backend
+//
+
 // get the account history, i.e. transaction list for the given account
 export const getHistory = async (parseAddress, accountNum) => {
   const Parse = require('parse/react-native.js');
@@ -34,7 +39,6 @@ export const getAccounts = async (parseAddress, user) => {
   const Parse = require('parse/react-native.js');
   Parse.setAsyncStorage(AsyncStorage);
   Parse.initialize('APPLICATION_ID');
-  //console.log("in getAccounts() and parse address is " + parseAddress)
   Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
 
   const params = {userId: user};
@@ -44,12 +48,6 @@ export const getAccounts = async (parseAddress, user) => {
 
 // get the balance of the given account
 export const getAccountBalance = async (parseAddress, accountNum) => {
-  console.log(
-    'mark in getAccountBalance, parseAdress = ' +
-      parseAddress +
-      ' and accountNum = ' +
-      accountNum,
-  );
   if (parseAddress.length < 1) {
     return;
   }
@@ -59,6 +57,5 @@ export const getAccountBalance = async (parseAddress, accountNum) => {
   Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
   const params = {accountNum: accountNum};
   const balance = await Parse.Cloud.run('balance', params);
-  console.log('balance is ' + balance);
   return balance;
 };

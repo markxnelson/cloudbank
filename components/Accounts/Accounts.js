@@ -12,14 +12,15 @@ const Accounts = props => {
   const [accounts, setAccounts] = useState([]);
   const [refresh, setRefresh] = useState(0);
 
+  // hook to retrieve the user's account list
+  // the for each account number, find the type and balance
+  // and save this information in local state
   useEffect(() => {
-    console.log('getting accounts for user ' + props.user);
     AsyncStorage.getItem('serverAddress')
       .then(address => {
         getAccounts(address, props.user)
           .then(accountNumbers => {
             accountNumbers.forEach(item => {
-              console.log('processing ' + item);
               getAccountType(address, item)
                 .then(type => {
                   getAccountBalance(address, item)
@@ -65,7 +66,8 @@ const Accounts = props => {
       })
       .catch(error => console.log(error));
 
-    // force refresh after BACK
+    // force refresh after BACK so balances will be updated if 
+    // a transaction just occurred
     /* eslint-disable no-unused-vars */
     const willFocusSubscription = props.navigation.addListener('focus', () =>
       setRefresh(refresh + 1),
@@ -73,7 +75,7 @@ const Accounts = props => {
     /* eslint-enable no-unused-vars */
   }, [refresh, props.navigation, props.user]);
 
-  // sort the account by account number
+  // sort the accounts by account number
   const accountList =
     accounts.length !== 0 ? (
       accounts

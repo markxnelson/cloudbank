@@ -13,13 +13,13 @@ const AccountDetail = ({route, navigation}) => {
   const [parseAddress, setParseAddress] = useState('');
   const [accountType, setAccountType] = useState('');
 
+  // hook to retrieve the account history (i.e. transactions)
+  // and account type
   useEffect(() => {
-    console.log('mark account number =' + route.params.accountNumber);
     AsyncStorage.getItem('serverAddress').then(address => {
       getHistory(address, route.params.accountNumber)
         .then(result => setHistory(result))
         .catch(error => console.log(error));
-      console.log('result = ' + JSON.stringify(history));
       getAccountType(address, route.params.accountNumber)
         .then(result => setAccountType(result))
         .catch(error => console.log(error));
@@ -66,7 +66,7 @@ const AccountDetail = ({route, navigation}) => {
       </View>
     );
 
-  // TODO call balnce api instead of calculating it here
+  // TODO call balance api instead of calculating it here
   const balance =
     history.length === 0
       ? 0

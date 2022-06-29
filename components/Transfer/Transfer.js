@@ -16,6 +16,7 @@ import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getAccountType, getAccounts} from '../common/common';
 
+// this function performs the actual transfer on the backend
 const performTransfer = async (
   parseAddress,
   fromAccountNum,
@@ -49,12 +50,15 @@ const Transfer = props => {
   const [parseAddress, setParseAddress] = useState('');
   const [accounts, setAccounts] = useState([]);
 
+  // hook to retreive the parse server address and store in local state
   useEffect(() => {
     AsyncStorage.getItem('serverAddress').then(storedAddress => {
       storedAddress && setParseAddress(storedAddress);
     });
   }, [parseAddress, setParseAddress]);
 
+  // hook to get the user's account numbers and lookup the type for each
+  // one and store this in local state - we use this in the picker
   useEffect(() => {
     AsyncStorage.getItem('serverAddress').then(address => {
       getAccounts(address, props.user).then(accountNumbers => {
@@ -117,7 +121,6 @@ const Transfer = props => {
           text: 'OK',
           style: 'cancel',
           onPress: () => {
-            console.log('ok pressed');
             props.navigation.navigate('Home');
           },
         },
@@ -125,7 +128,6 @@ const Transfer = props => {
       {
         cancelable: true,
         onDismiss: () => {
-          console.log('dismissed');
           props.navigation.navigate('Home');
         },
       },

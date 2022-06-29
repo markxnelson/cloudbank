@@ -3,19 +3,21 @@ import {TextInput, StyleSheet, Button} from 'react-native';
 import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// this component is the login form
 const LoginForm = props => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [parseAddress, setParseAddress] = useState('');
 
+  // handle the login button
   const submitHandler = event => {
     event.preventDefault();
     props.onLogin(email, password, parseAddress);
   };
 
+  // hook to lookup parse server address and store in local state
   useEffect(() => {
     AsyncStorage.getItem('serverAddress').then(storedAddress => {
-      console.log(storedAddress);
       storedAddress && setParseAddress(storedAddress);
     });
   }, [parseAddress, setParseAddress]);
