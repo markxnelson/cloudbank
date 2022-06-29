@@ -57,7 +57,7 @@ const App = () => {
               {props => <Transfer {...props} user={user} />}
             </Stack.Screen>
             <Stack.Screen name="Payment">
-              {props => <Payment {...props} />}
+              {props => <Payment {...props} user={user} />}
             </Stack.Screen>
             <Stack.Screen name="Deposit">
               {props => <Deposit {...props} user={user} />}

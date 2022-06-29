@@ -1,12 +1,80 @@
 import { Picker } from '@react-native-picker/picker';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, Button, Alert } from 'react-native';
 import Card from '../UI/Card';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const getAccounts = async (parseAddress, user) => {
+    const Parse = require('parse/react-native.js');
+    Parse.setAsyncStorage(AsyncStorage);
+    Parse.initialize("APPLICATION_ID");
+    //console.log("in getAccounts() and parse address is " + parseAddress)
+    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
+
+    const params = { "userId": user };
+    const accounts = await Parse.Cloud.run("getaccountsforuser", params);
+    return accounts;
+}
+
+const getAccountType = async (parseAddress, accountNum) => {
+    console.log("mark in getAccountType, parseAdress = " + parseAddress + " and accountNum = " + accountNum);
+    if (parseAddress.length < 1) { return }
+    const Parse = require('parse/react-native.js');
+    Parse.setAsyncStorage(AsyncStorage);
+    Parse.initialize("APPLICATION_ID");
+    // console.log("in getAccountType() for " + accountNum)
+    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
+    const params = { "accountNum": accountNum };
+    const accountType = await Parse.Cloud.run("getaccounttypeforaccountnum", params);
+    console.log("accountType is " + accountType);
+    return accountType;
+}
 
 const Payment = (props) => {
-    const [fromAccount, setFromAccount] = useState('100')
+    const [fromAccount, setFromAccount] = useState('')
     const [toAccount, setToAccount] = useState('102')
     const [amount, setAmount] = useState('0.00')
+    const [parseAddress, setParseAddress] = useState('');
+    const [accounts, setAccounts] = useState([]);
+    
+    useEffect(() => {
+        AsyncStorage.getItem('serverAddress')
+        .then(storedAddress => {
+            console.log(storedAddress);
+            storedAddress && setParseAddress(storedAddress);
+        })
+    }, [parseAddress, setParseAddress])
+
+    useEffect(() => {
+        console.log("getting accounts for user " + props.user)
+        AsyncStorage.getItem('serverAddress')
+        .then(address => {
+            getAccounts(address, props.user)
+            .then(accountNumbers => {
+                accountNumbers.forEach(item => {
+                    console.log("processing " + item);
+                    getAccountType(address, item)
+                    .then(type => {
+                        setAccounts((prev) => [...prev, {
+                            accountNumber: item,
+                            accountType: type
+                        }])
+                        // this is a hack to make sure that the controlled state is initialized
+                        setFromAccount(item)
+                    })
+                    .catch(error => console.log(error))
+                })
+            })
+        })
+    }, [props.user])
+
+    const accountList = accounts.length !== 0 ? accounts
+    .sort((a, b) => (+b.accountNumber) - (+a.accountNumber))
+    .map(account => {
+        return (
+            <Picker.Item key={account.accountNumber} value={account.accountNumber} label={account.accountNumber + " - " + account.accountType} />
+        )
+    }) : <></>
 
     const paymentHandler = () => {
         Alert.alert(
@@ -44,8 +112,7 @@ const Payment = (props) => {
                         <Picker
                             selectedValue={fromAccount}
                             onValueChange={currentFromAccount => setFromAccount(currentFromAccount)}>
-                            <Picker.Item value="100" label="100 : Checking" />
-                            <Picker.Item value="102" label="102 : Savings" />
+                            {accountList}
                         </Picker>
                     </View>
                 </View>
