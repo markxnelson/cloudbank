@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ScrollView, TextInput, Button, Alert } from 're
 import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const performTransfer = async (parseAddress, fromAccountNum, toAccountNum, amount, accountType) => {
+const performTransfer = async (parseAddress, fromAccountNum, toAccountNum, amount, accountType, destinationBank) => {
     const Parse = require('parse/react-native.js');
     Parse.setAsyncStorage(AsyncStorage);
     Parse.initialize("APPLICATION_ID");
@@ -16,7 +16,9 @@ const performTransfer = async (parseAddress, fromAccountNum, toAccountNum, amoun
     transfer.set("action", "Transfer");
     transfer.set("amount", +amount);
     transfer.set("userId", "mark");
-    transfer.set("externalAccountNum", +toAccountNum);
+    destinationBank === 'CloudBank' 
+        ? transfer.set("toAccountNum", +toAccountNum) 
+        : transfer.set("externalAccountNum", +toAccountNum);
     transfer.set("accountType", accountType);
     transfer.save()
     .then((id) => console.log("saved with id " + JSON.stringify(id)),
@@ -53,6 +55,7 @@ const Payment = (props) => {
     const [fromAccount, setFromAccount] = useState('')
     const [toAccount, setToAccount] = useState('102')
     const [amount, setAmount] = useState('0.00')
+    const [destinationBank, setDestinationBank] = useState('CloudBank');
     const [parseAddress, setParseAddress] = useState('');
     const [accounts, setAccounts] = useState([]);
     
@@ -99,7 +102,7 @@ const Payment = (props) => {
         // get the account type
         const accountType = accounts.find(item => item.accountNumber === fromAccount).accountType
 
-        performTransfer(parseAddress, fromAccount, toAccount, amount, accountType);
+        performTransfer(parseAddress, fromAccount, toAccount, amount, accountType, destinationBank);
         
         Alert.alert(
             "Payment",
@@ -137,6 +140,18 @@ const Payment = (props) => {
                             selectedValue={fromAccount}
                             onValueChange={currentFromAccount => setFromAccount(currentFromAccount)}>
                             {accountList}
+                        </Picker>
+                    </View>
+                </View>
+                <View>
+                    <Text>{' '}</Text>
+                    <Text>Destination Bank:</Text>
+                    <View style={{ borderWidth: 1, borderColor: 'gray' }}>
+                    <Picker
+                            selectedValue={destinationBank}
+                            onValueChange={destinationBank => setDestinationBank(destinationBank)}>
+                            <Picker.Item key='CloudBank' value='CloudBank' label='CloudBank' />
+                            <Picker.Item key='ReggieBank' value='ReggieBank' label='ReggieBank' />
                         </Picker>
                     </View>
                 </View>
