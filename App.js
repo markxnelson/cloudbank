@@ -60,7 +60,7 @@ const App = () => {
               {props => <Payment {...props} />}
             </Stack.Screen>
             <Stack.Screen name="Deposit">
-              {props => <Deposit {...props} />}
+              {props => <Deposit {...props} user={user} />}
             </Stack.Screen>
           </>
         ) : (
