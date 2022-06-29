@@ -1,3 +1,6 @@
+// Copyright (c) 2022, Oracle and/or its affiliates.
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+
 import React, { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginForm from './components/Login/LoginForm';
@@ -14,15 +17,20 @@ import { Alert } from 'react-native';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+  // isLoggedIn is used to control whether to show the login screen or the main app ui
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // user stores the username of the logged in user
   const [user, setUser] = useState("");
 
+  // called when the user logs out
   const logoutHandler = () => {
     AsyncStorage.removeItem('isLoggedIn');
     setIsLoggedIn(false);
   }
 
+  // called when the user logs in
   const loginHandler = (user, password, serverAddress) => {
+    // do some very basic form validation
     if (user.length < 1) {
       Alert.alert("You must enter your username");
       return;
@@ -32,10 +40,11 @@ const App = () => {
       return;
     }
     // TODO call API to validate user exists, etc.
+
+    // store the logged in state and the server address that the user entered
     AsyncStorage.setItem('isLoggedIn', '1')
     AsyncStorage.setItem('serverAddress', serverAddress)
     setUser(user);
-    console.log("logged in " + user + " " + password + " " + serverAddress)
     setIsLoggedIn(true);
   }
 

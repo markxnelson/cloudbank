@@ -1,33 +1,12 @@
+// Copyright (c) 2022, Oracle and/or its affiliates.
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatCurrency } from "react-native-format-currency";
-
-const getHistory = async (parseAddress, accountNum) => {
-    const Parse = require('parse/react-native.js');
-    Parse.setAsyncStorage(AsyncStorage);
-    Parse.initialize("APPLICATION_ID");
-    console.log("in getHistory() and parse address is " + parseAddress)
-    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
-
-    const params = { "accountNum": accountNum };
-    const history = await Parse.Cloud.run("history", params);
-    //console.log("cloud code result= " + JSON.stringify(history));
-    return history;
-}
-
-const getAccountType = async (parseAddress, accountNum) => {
-        const Parse = require('parse/react-native.js');
-    Parse.setAsyncStorage(AsyncStorage);
-    Parse.initialize("APPLICATION_ID");
-    console.log("in getHistory() and parse address is " + parseAddress)
-    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
-
-    const params = { "accountNum": accountNum };
-    const accountType = await Parse.Cloud.run("getaccounttypeforaccountnum", params);
-    return accountType;
-}
+import { getHistory, getAccountType } from '../common/common';
 
 const AccountDetail = ({route, navigation}) => {
     const [history, setHistory] = useState([]);
@@ -39,10 +18,12 @@ const AccountDetail = ({route, navigation}) => {
         AsyncStorage.getItem('serverAddress')
         .then(address => {
             getHistory(address, route.params.accountNumber)
-            .then(result => setHistory(result));
+            .then(result => setHistory(result))
+            .catch(error => console.log(error));
             console.log("result = " + JSON.stringify(history));
             getAccountType(address, route.params.accountNumber)
-            .then(result => setAccountType(result));
+            .then(result => setAccountType(result))
+            .catch(error => console.log(error));
         })
     }, [route.params.accountNum, parseAddress, setParseAddress])
 

@@ -1,8 +1,11 @@
+// Copyright (c) 2022, Oracle and/or its affiliates.
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Card from '../UI/Card';
 
-const Insurance = (props) => {
+const Insurance = () => {
     return (
         <Card title="My Insurance">
             <View style={styles.row}>

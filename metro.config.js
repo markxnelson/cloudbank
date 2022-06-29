@@ -1,10 +1,12 @@
 /**
  * Metro configuration for React Native
  * https://github.com/facebook/react-native
+ * 
+ * Copyright (c) 2022, Oracle and/or its affiliates.
+ * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
  *
  * @format
  */
-// const exclusionList = require('metro-config/src/defaults/exclusionList');
 
 module.exports = {
   transformer: {
@@ -17,8 +19,5 @@ module.exports = {
   },
   resolver: {
     sourceExts: ['jsx', 'js', 'ts', 'tsx', 'cjs'],
-    // exclusionList: exclusionList([
-    //     /node_modules\/.*\/node_modules\/react-native\/.*/,
-    // ])
 },
 };

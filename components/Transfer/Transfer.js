@@ -1,8 +1,12 @@
+// Copyright (c) 2022, Oracle and/or its affiliates.
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+
 import { Picker } from '@react-native-picker/picker';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, Button, Alert } from 'react-native';
 import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAccountType, getAccounts } from '../common/common';
 
 const performTransfer = async (parseAddress, fromAccountNum, toAccountNum, amount, accountType) => {
     const Parse = require('parse/react-native.js');
@@ -23,32 +27,6 @@ const performTransfer = async (parseAddress, fromAccountNum, toAccountNum, amoun
         (error) => console.log("failed to save, error = " + error))
 }
 
-const getAccounts = async (parseAddress, user) => {
-    const Parse = require('parse/react-native.js');
-    Parse.setAsyncStorage(AsyncStorage);
-    Parse.initialize("APPLICATION_ID");
-    //console.log("in getAccounts() and parse address is " + parseAddress)
-    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
-
-    const params = { "userId": user };
-    const accounts = await Parse.Cloud.run("getaccountsforuser", params);
-    return accounts;
-}
-
-const getAccountType = async (parseAddress, accountNum) => {
-    console.log("mark in getAccountType, parseAdress = " + parseAddress + " and accountNum = " + accountNum);
-    if (parseAddress.length < 1) { return }
-    const Parse = require('parse/react-native.js');
-    Parse.setAsyncStorage(AsyncStorage);
-    Parse.initialize("APPLICATION_ID");
-    // console.log("in getAccountType() for " + accountNum)
-    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
-    const params = { "accountNum": accountNum };
-    const accountType = await Parse.Cloud.run("getaccounttypeforaccountnum", params);
-    console.log("accountType is " + accountType);
-    return accountType;
-}
-
 const Transfer = (props) => {
     const [fromAccount, setFromAccount] = useState('')
     const [toAccount, setToAccount] = useState('')
@@ -59,26 +37,23 @@ const Transfer = (props) => {
     useEffect(() => {
         AsyncStorage.getItem('serverAddress')
         .then(storedAddress => {
-            console.log(storedAddress);
             storedAddress && setParseAddress(storedAddress);
         })
     }, [parseAddress, setParseAddress])
 
     useEffect(() => {
-        console.log("getting accounts for user " + props.user)
         AsyncStorage.getItem('serverAddress')
         .then(address => {
             getAccounts(address, props.user)
             .then(accountNumbers => {
                 accountNumbers.forEach(item => {
-                    console.log("processing " + item);
                     getAccountType(address, item)
                     .then(type => {
                         setAccounts((prev) => [...prev, {
                             accountNumber: item,
                             accountType: type
                         }])
-                        // this is a hack to make sure that the controlled state is initialized
+                        // make sure that the controlled state is initialized
                         setFromAccount(item)
                         setToAccount(item)
                     })
@@ -100,7 +75,10 @@ const Transfer = (props) => {
         // get the account type
         const accountType = accounts.find(item => item.accountNumber === fromAccount).accountType
 
+        // perform the actual transfer
         performTransfer(parseAddress, fromAccount, toAccount, amount, accountType);
+
+        // report success to the user
         Alert.alert(
             "Transfer",
             "Successfully transfered $" + amount + " from account " + fromAccount + " to account " + toAccount,
@@ -120,10 +98,8 @@ const Transfer = (props) => {
                     console.log('dismissed')
                     props.navigation.navigate('Home')
                 }
-            }
-            
-        )
-        
+            }   
+        )   
     }
 
     return (

@@ -1,47 +1,12 @@
+// Copyright (c) 2022, Oracle and/or its affiliates.
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatCurrency } from "react-native-format-currency";
-
-const getAccounts = async (parseAddress, user) => {
-    const Parse = require('parse/react-native.js');
-    Parse.setAsyncStorage(AsyncStorage);
-    Parse.initialize("APPLICATION_ID");
-    //console.log("in getAccounts() and parse address is " + parseAddress)
-    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
-
-    const params = { "userId": user };
-    const accounts = await Parse.Cloud.run("getaccountsforuser", params);
-    return accounts;
-}
-
-const getAccountType = async (parseAddress, accountNum) => {
-    console.log("mark in getAccountType, parseAdress = " + parseAddress + " and accountNum = " + accountNum);
-    if (parseAddress.length < 1) { return }
-    const Parse = require('parse/react-native.js');
-    Parse.setAsyncStorage(AsyncStorage);
-    Parse.initialize("APPLICATION_ID");
-    // console.log("in getAccountType() for " + accountNum)
-    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
-    const params = { "accountNum": accountNum };
-    const accountType = await Parse.Cloud.run("getaccounttypeforaccountnum", params);
-    console.log("accountType is " + accountType);
-    return accountType;
-}
-
-const getAccountBalance = async (parseAddress, accountNum) => {
-    console.log("mark in getAccountBalance, parseAdress = " + parseAddress + " and accountNum = " + accountNum);
-    if (parseAddress.length < 1) { return }
-    const Parse = require('parse/react-native.js');
-    Parse.setAsyncStorage(AsyncStorage);
-    Parse.initialize("APPLICATION_ID");
-    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
-    const params = { "accountNum": accountNum };
-    const balance = await Parse.Cloud.run("balance", params);
-    console.log("balance is " + balance);
-    return balance;
-}
+import { getAccountType, getAccounts, getAccountBalance } from '../common/common';
 
 const Accounts = (props) => {
     const [accounts, setAccounts] = useState([]);
@@ -85,9 +50,12 @@ const Accounts = (props) => {
                                 return updatedState;
                             })
                         })
-                    });
+                        .catch(error => console.log(error))
+                    })
+                    .catch(error => console.log(error));
                 })
-            });
+            })
+            .catch(error => console.log(error));
         })
         .catch(error => console.log(error))
 
