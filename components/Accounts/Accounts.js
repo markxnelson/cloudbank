@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatCurrency } from "react-native-format-currency";
-import symbolicateStackTrace from 'react-native/Libraries/Core/Devtools/symbolicateStackTrace';
 
 const getAccounts = async (parseAddress, user) => {
     const Parse = require('parse/react-native.js');

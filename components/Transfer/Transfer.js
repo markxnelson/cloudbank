@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ScrollView, TextInput, Button, Alert } from 're
 import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const performTransfer = async (parseAddress, fromAccountNum, toAccountNum, amount) => {
+const performTransfer = async (parseAddress, fromAccountNum, toAccountNum, amount, accountType) => {
     const Parse = require('parse/react-native.js');
     Parse.setAsyncStorage(AsyncStorage);
     Parse.initialize("APPLICATION_ID");
@@ -17,17 +17,44 @@ const performTransfer = async (parseAddress, fromAccountNum, toAccountNum, amoun
     transfer.set("amount", +amount);
     transfer.set("userId", "mark");
     transfer.set("toAccountNum", +toAccountNum);
-    transfer.set("accountType", "Checking");
+    transfer.set("accountType", accountType);
     transfer.save()
     .then((id) => console.log("saved with id " + JSON.stringify(id)),
         (error) => console.log("failed to save, error = " + error))
 }
 
+const getAccounts = async (parseAddress, user) => {
+    const Parse = require('parse/react-native.js');
+    Parse.setAsyncStorage(AsyncStorage);
+    Parse.initialize("APPLICATION_ID");
+    //console.log("in getAccounts() and parse address is " + parseAddress)
+    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
+
+    const params = { "userId": user };
+    const accounts = await Parse.Cloud.run("getaccountsforuser", params);
+    return accounts;
+}
+
+const getAccountType = async (parseAddress, accountNum) => {
+    console.log("mark in getAccountType, parseAdress = " + parseAddress + " and accountNum = " + accountNum);
+    if (parseAddress.length < 1) { return }
+    const Parse = require('parse/react-native.js');
+    Parse.setAsyncStorage(AsyncStorage);
+    Parse.initialize("APPLICATION_ID");
+    // console.log("in getAccountType() for " + accountNum)
+    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
+    const params = { "accountNum": accountNum };
+    const accountType = await Parse.Cloud.run("getaccounttypeforaccountnum", params);
+    console.log("accountType is " + accountType);
+    return accountType;
+}
+
 const Transfer = (props) => {
-    const [fromAccount, setFromAccount] = useState('45000')
-    const [toAccount, setToAccount] = useState('45102')
+    const [fromAccount, setFromAccount] = useState('')
+    const [toAccount, setToAccount] = useState('')
     const [amount, setAmount] = useState('0.00')
-    const [parseAddress, setParseAddress] = useState("");
+    const [parseAddress, setParseAddress] = useState('');
+    const [accounts, setAccounts] = useState([]);
     
     useEffect(() => {
         AsyncStorage.getItem('serverAddress')
@@ -37,8 +64,43 @@ const Transfer = (props) => {
         })
     }, [parseAddress, setParseAddress])
 
+    useEffect(() => {
+        console.log("getting accounts for user " + props.user)
+        AsyncStorage.getItem('serverAddress')
+        .then(address => {
+            getAccounts(address, props.user)
+            .then(accountNumbers => {
+                accountNumbers.forEach(item => {
+                    console.log("processing " + item);
+                    getAccountType(address, item)
+                    .then(type => {
+                        setAccounts((prev) => [...prev, {
+                            accountNumber: item,
+                            accountType: type
+                        }])
+                        // this is a hack to make sure that the controlled state is initialized
+                        setFromAccount(item)
+                        setToAccount(item)
+                    })
+                    .catch(error => console.log(error))
+                })
+            })
+        })
+    }, [props.user])
+
+    const accountList = accounts.length !== 0 ? accounts
+        .sort((a, b) => (+b.accountNumber) - (+a.accountNumber))
+        .map(account => {
+            return (
+                <Picker.Item value={account.accountNumber} label={account.accountNumber + " - " + account.accountType} />
+            )
+        }) : <></>
+
     const transferHandler = () => {
-        performTransfer(parseAddress, fromAccount, toAccount, amount);
+        // get the account type
+        const accountType = accounts.find(item => item.accountNumber === fromAccount).accountType
+
+        performTransfer(parseAddress, fromAccount, toAccount, amount, accountType);
         Alert.alert(
             "Transfer",
             "Successfully transfered $" + amount + " from account " + fromAccount + " to account " + toAccount,
@@ -74,8 +136,7 @@ const Transfer = (props) => {
                         <Picker
                             selectedValue={fromAccount}
                             onValueChange={currentFromAccount => setFromAccount(currentFromAccount)}>
-                            <Picker.Item value="45000" label="45000 : Checking" />
-                            <Picker.Item value="45102" label="45102 : Savings" />
+                            {accountList}
                         </Picker>
                     </View>
                 </View>
@@ -86,8 +147,7 @@ const Transfer = (props) => {
                         <Picker
                             selectedValue={toAccount}
                             onValueChange={currentToAccount => setToAccount(currentToAccount)}>
-                            <Picker.Item value="45000" label="45000 : Checking" />
-                            <Picker.Item value="45102" label="45102 : Savings" />
+                            {accountList}
                         </Picker>
                     </View>
                 </View>
