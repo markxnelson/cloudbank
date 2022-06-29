@@ -4,7 +4,7 @@ import Card from '../UI/Card';
 
 const CreditCards = (props) => {
     return (
-        <Card title="My Investments">
+        <Card title="My Credit Cards">
             <View style={styles.row}>
                 <View style={styles.cell}><Text>AAdvantage</Text></View>
                 <View style={styles.cell}><Text style={styles.numbers}>$1,098.56</Text></View>

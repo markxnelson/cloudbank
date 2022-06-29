@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatCurrency } from "react-native-format-currency";
+import symbolicateStackTrace from 'react-native/Libraries/Core/Devtools/symbolicateStackTrace';
 
 const getAccounts = async (parseAddress, user) => {
     const Parse = require('parse/react-native.js');
@@ -44,48 +45,66 @@ const getAccountBalance = async (parseAddress, accountNum) => {
 }
 
 const Accounts = (props) => {
-    const [parseAddress, setParseAddress] = useState("");
     const [accounts, setAccounts] = useState([]);
+    const [refresh, setRefresh] = useState(0);
 
     useEffect(() => {
         console.log("getting accounts for user " + props.user)
         AsyncStorage.getItem('serverAddress')
         .then(address => {
-            setParseAddress(address); // this is a nasty hack
             getAccounts(address, props.user)
             .then(accountNumbers => {
-                //setAccounts(result);
-                // TODO - we could iterate through them here and get the type and balance,
-                //        and store these in a local state object, not just a list of numbers ... 
                 accountNumbers.forEach(item => {
                     console.log("processing " + item);
                     getAccountType(address, item)
                     .then(type => {
                         getAccountBalance(address, item)
                         .then(balance => {
-                            // TODO - need to check for duplicate account numbers!!!
-                            setAccounts((prev) => [...prev,
-                                {
-                                    accountNumber: item,
-                                    accountType: type,
-                                    balance: formatCurrency({amount : (+balance).toFixed(2), code: 'USD' })[0]
-                                }]
-                            )
+                            setAccounts((prev) => {
+                                // first check if the account is already there, if so, update it
+                                const updatedState = prev.map(entry => {
+                                    if (entry.accountNumber === item) {
+                                        // replace existing entry
+                                        return {
+                                            accountNumber: item,
+                                            accountType: type,
+                                            balance: formatCurrency({amount : (+balance).toFixed(2), code: 'USD' })[0]
+                                        }
+                                    } else { 
+                                        // keep existing entry
+                                        return entry;
+                                    }
+                                })
+                                // if the account was not there, we need to add it
+                                if (!prev.some(entry => entry.accountNumber === item)) {
+                                    updatedState.push({
+                                        accountNumber: item,
+                                        accountType: type,
+                                        balance: formatCurrency({amount : (+balance).toFixed(2), code: 'USD' })[0]
+                                    })
+                                }
+                                return updatedState;
+                            })
                         })
                     });
                 })
             });
         })
         .catch(error => console.log(error))
-    }, [props.user])
 
+        // force refresh after BACK 
+        const willFocusSubscription = props.navigation.addListener('focus', () => setRefresh(refresh + 1));
+    }, [refresh])
+
+    // sort the account by account number
     const accountList = accounts.length !== 0 ? accounts
+        .sort((a, b) => (+b.accountNumber) - (+a.accountNumber))
         .map(account => {
             return (
                 <TouchableWithoutFeedback onPress={() => props.navigation.navigate('AccountDetail', { accountNumber: account.accountNumber })}>
                     <View style={styles.row} key={account.accountNumber}>
                         <View style={styles.cell}><Text>{account.accountNumber}</Text></View>
-                        <View style={styles.cell}><Text>{account.accountType}</Text></View>
+                        <View style={styles.widecell}><Text>{account.accountType}</Text></View>
                         <View style={styles.cell}><Text style={styles.numbers}>{account.balance}</Text></View>
                     </View>
                 </TouchableWithoutFeedback>
@@ -111,6 +130,10 @@ const styles = StyleSheet.create({
         flex: 1,
         alignSelf: 'stretch',
         flexDirection: 'row'
+    },
+    widecell: {
+        flex: 3,
+        alignSelf: 'stretch'
     },
     cell: {
         flex: 1,
