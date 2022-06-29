@@ -1,175 +1,205 @@
 // Copyright (c) 2022, Oracle and/or its affiliates.
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
-import { Picker } from '@react-native-picker/picker';
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Button, Alert } from 'react-native';
+import {Picker} from '@react-native-picker/picker';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  Button,
+  Alert,
+} from 'react-native';
 import Card from '../UI/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getAccountType, getAccounts } from '../common/common';
+import {getAccountType, getAccounts} from '../common/common';
 
-const performTransfer = async (parseAddress, fromAccountNum, toAccountNum, amount, accountType) => {
-    const Parse = require('parse/react-native.js');
-    Parse.setAsyncStorage(AsyncStorage);
-    Parse.initialize("APPLICATION_ID");
-    Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
+const performTransfer = async (
+  parseAddress,
+  fromAccountNum,
+  toAccountNum,
+  amount,
+  accountType,
+) => {
+  const Parse = require('parse/react-native.js');
+  Parse.setAsyncStorage(AsyncStorage);
+  Parse.initialize('APPLICATION_ID');
+  Parse.serverURL = 'http://' + parseAddress + ':1337/parse';
 
-    const Transfer = Parse.Object.extend("BankAccount");
-    const transfer = new Transfer();
-    transfer.set("accountNum", +fromAccountNum);
-    transfer.set("action", "Transfer");
-    transfer.set("amount", +amount);
-    transfer.set("userId", "mark");
-    transfer.set("toAccountNum", +toAccountNum);
-    transfer.set("accountType", accountType);
-    transfer.save()
-    .then((id) => console.log("saved with id " + JSON.stringify(id)),
-        (error) => console.log("failed to save, error = " + error))
-}
+  const Transfer = Parse.Object.extend('BankAccount');
+  const transfer = new Transfer();
+  transfer.set('accountNum', +fromAccountNum);
+  transfer.set('action', 'Transfer');
+  transfer.set('amount', +amount);
+  transfer.set('userId', 'mark');
+  transfer.set('toAccountNum', +toAccountNum);
+  transfer.set('accountType', accountType);
+  transfer.save().then(
+    id => console.log('saved with id ' + JSON.stringify(id)),
+    error => console.log('failed to save, error = ' + error),
+  );
+};
 
-const Transfer = (props) => {
-    const [fromAccount, setFromAccount] = useState('')
-    const [toAccount, setToAccount] = useState('')
-    const [amount, setAmount] = useState('0.00')
-    const [parseAddress, setParseAddress] = useState('');
-    const [accounts, setAccounts] = useState([]);
-    
-    useEffect(() => {
-        AsyncStorage.getItem('serverAddress')
-        .then(storedAddress => {
-            storedAddress && setParseAddress(storedAddress);
-        })
-    }, [parseAddress, setParseAddress])
+const Transfer = props => {
+  const [fromAccount, setFromAccount] = useState('');
+  const [toAccount, setToAccount] = useState('');
+  const [amount, setAmount] = useState('0.00');
+  const [parseAddress, setParseAddress] = useState('');
+  const [accounts, setAccounts] = useState([]);
 
-    useEffect(() => {
-        AsyncStorage.getItem('serverAddress')
-        .then(address => {
-            getAccounts(address, props.user)
-            .then(accountNumbers => {
-                accountNumbers.forEach(item => {
-                    getAccountType(address, item)
-                    .then(type => {
-                        setAccounts((prev) => [...prev, {
-                            accountNumber: item,
-                            accountType: type
-                        }])
-                        // make sure that the controlled state is initialized
-                        setFromAccount(item)
-                        setToAccount(item)
-                    })
-                    .catch(error => console.log(error))
-                })
-            })
-        })
-    }, [props.user])
+  useEffect(() => {
+    AsyncStorage.getItem('serverAddress').then(storedAddress => {
+      storedAddress && setParseAddress(storedAddress);
+    });
+  }, [parseAddress, setParseAddress]);
 
-    const accountList = accounts.length !== 0 ? accounts
-        .sort((a, b) => (+b.accountNumber) - (+a.accountNumber))
-        .map(account => {
-            return (
-                <Picker.Item value={account.accountNumber} label={account.accountNumber + " - " + account.accountType} />
-            )
-        }) : <></>
-
-    const transferHandler = () => {
-        // get the account type
-        const accountType = accounts.find(item => item.accountNumber === fromAccount).accountType
-
-        // perform the actual transfer
-        performTransfer(parseAddress, fromAccount, toAccount, amount, accountType);
-
-        // report success to the user
-        Alert.alert(
-            "Transfer",
-            "Successfully transfered $" + amount + " from account " + fromAccount + " to account " + toAccount,
-            [
+  useEffect(() => {
+    AsyncStorage.getItem('serverAddress').then(address => {
+      getAccounts(address, props.user).then(accountNumbers => {
+        accountNumbers.forEach(item => {
+          getAccountType(address, item)
+            .then(type => {
+              setAccounts(prev => [
+                ...prev,
                 {
-                    text: 'OK',
-                    style: 'cancel',
-                    onPress: () => {
-                        console.log('ok pressed')
-                        props.navigation.navigate('Home')
-                    }
-                }
-            ],
-            {
-                cancelable: true,
-                onDismiss: () => {
-                    console.log('dismissed')
-                    props.navigation.navigate('Home')
-                }
-            }   
-        )   
-    }
+                  accountNumber: item,
+                  accountType: type,
+                },
+              ]);
+              // make sure that the controlled state is initialized
+              setFromAccount(item);
+              setToAccount(item);
+            })
+            .catch(error => console.log(error));
+        });
+      });
+    });
+  }, [props.user]);
 
-    return (
-        <ScrollView style={styles.main}>
-            <Card title="Transfer between accounts">
-                <View>
-                    <Text>{' '}</Text>
-                    <Text>From account:</Text>
-                    <View style={{ borderWidth: 1, borderColor: 'gray' }}>
-                        <Picker
-                            selectedValue={fromAccount}
-                            onValueChange={currentFromAccount => setFromAccount(currentFromAccount)}>
-                            {accountList}
-                        </Picker>
-                    </View>
-                </View>
-                <View>
-                    <Text>{' '}</Text>
-                    <Text>To account:</Text>
-                    <View style={{ borderWidth: 1, borderColor: 'gray' }}>
-                        <Picker
-                            selectedValue={toAccount}
-                            onValueChange={currentToAccount => setToAccount(currentToAccount)}>
-                            {accountList}
-                        </Picker>
-                    </View>
-                </View>
-                <View>
-                    <Text>{' '}</Text>
-                    <Text>Amount:</Text>
-                    <View style={{ borderWidth: 1, borderColor: 'gray' }}>
-                        <TextInput
-                            placeholder="0.00"
-                            keyboardType='number-pad'
-                            value={amount}
-                            onChangeText={currentAmount => setAmount(currentAmount)}
-                        />
-                    </View>
-                    <Text>{' '}</Text>
+  const accountList =
+    accounts.length !== 0 ? (
+      accounts
+        .sort((a, b) => +b.accountNumber - +a.accountNumber)
+        .map(account => {
+          return (
+            <Picker.Item
+              value={account.accountNumber}
+              label={account.accountNumber + ' - ' + account.accountType}
+            />
+          );
+        })
+    ) : (
+      <></>
+    );
 
-                </View>
-                <Button
-                    title="Transfer"
-                    onPress={transferHandler}
-                />
-            </Card>
-        </ScrollView>
-    )
-}
+  const transferHandler = () => {
+    // get the account type
+    const accountType = accounts.find(
+      item => item.accountNumber === fromAccount,
+    ).accountType;
+
+    // perform the actual transfer
+    performTransfer(parseAddress, fromAccount, toAccount, amount, accountType);
+
+    // report success to the user
+    Alert.alert(
+      'Transfer',
+      'Successfully transfered $' +
+        amount +
+        ' from account ' +
+        fromAccount +
+        ' to account ' +
+        toAccount,
+      [
+        {
+          text: 'OK',
+          style: 'cancel',
+          onPress: () => {
+            console.log('ok pressed');
+            props.navigation.navigate('Home');
+          },
+        },
+      ],
+      {
+        cancelable: true,
+        onDismiss: () => {
+          console.log('dismissed');
+          props.navigation.navigate('Home');
+        },
+      },
+    );
+  };
+
+  return (
+    <ScrollView style={styles.main}>
+      <Card title="Transfer between accounts">
+        <View>
+          <Text> </Text>
+          <Text>From account:</Text>
+          <View style={{borderWidth: 1, borderColor: 'gray'}}>
+            <Picker
+              selectedValue={fromAccount}
+              onValueChange={currentFromAccount =>
+                setFromAccount(currentFromAccount)
+              }>
+              {accountList}
+            </Picker>
+          </View>
+        </View>
+        <View>
+          <Text> </Text>
+          <Text>To account:</Text>
+          <View style={{borderWidth: 1, borderColor: 'gray'}}>
+            <Picker
+              selectedValue={toAccount}
+              onValueChange={currentToAccount =>
+                setToAccount(currentToAccount)
+              }>
+              {accountList}
+            </Picker>
+          </View>
+        </View>
+        <View>
+          <Text> </Text>
+          <Text>Amount:</Text>
+          <View style={{borderWidth: 1, borderColor: 'gray'}}>
+            <TextInput
+              placeholder="0.00"
+              keyboardType="number-pad"
+              value={amount}
+              onChangeText={currentAmount => setAmount(currentAmount)}
+            />
+          </View>
+          <Text> </Text>
+        </View>
+        <Button title="Transfer" onPress={transferHandler} />
+      </Card>
+    </ScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
-    main: {
-        flex: 10
-    },
-    row: {
-        flex: 1,
-        alignSelf: 'stretch',
-        flexDirection: 'row'
-    },
-    cell: {
-        flex: 1,
-        alignSelf: 'stretch'
-    },
-    widecell: {
-        flex: 3,
-        alignSelf: 'stretch'
-    },
-    numbers: {
-        textAlign: 'right'
-    },
+  main: {
+    flex: 10,
+  },
+  row: {
+    flex: 1,
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+  },
+  cell: {
+    flex: 1,
+    alignSelf: 'stretch',
+  },
+  widecell: {
+    flex: 3,
+    alignSelf: 'stretch',
+  },
+  numbers: {
+    textAlign: 'right',
+  },
 });
 
 export default Transfer;
